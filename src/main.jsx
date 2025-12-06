@@ -9,11 +9,11 @@ import Loading from './common/Loading';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  //<React.StrictMode>
     <LoadingProvider>
       <Toaster position="top-right" reverseOrder={false} />
       <Loading />
       <App />
     </LoadingProvider>
-  </React.StrictMode>
+  //</React.StrictMode>
 );

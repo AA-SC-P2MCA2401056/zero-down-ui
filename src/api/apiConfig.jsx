@@ -26,6 +26,9 @@ const authHeaders = () => ({
 const ENDPOINTS = {
   LOGIN: "/auth/login",
   REGISTER: "/auth/register",
+  SENSOR_HISTORY: "/api/v1/sensor-readings/history",
+  SNAPSHOT: "/api/v1/dashboard/latest",
+  SENSOR_DASHBOARD_HISTORY: "/api/v1/dashboard/history",
   // Add more as needed
 };
 
