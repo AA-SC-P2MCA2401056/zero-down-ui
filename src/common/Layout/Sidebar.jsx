@@ -6,6 +6,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  SmartphoneNfc,
 } from "lucide-react";
 
 import React from 'react'
@@ -20,6 +21,7 @@ const Sidebar = () => {
     { path: "/d", label: "Detailed View", icon: <BarChart3 size={18} /> },
     { path: "/logs", label: "Sensor Log", icon: <Settings size={18} /> },
     { path: "/settings", label: "Settings", icon: <Settings size={18} /> },
+    { path: "/admin/sensors", label: "Sensors", icon: <SmartphoneNfc size={18} /> },
   ];
 
   return (

@@ -8,6 +8,7 @@ import NotFound from "./common/NotFound";
 import SensorLog from "./features/SensorLog";
 import Login from "./features/Login";
 import { ProtectedRoute, PublicRoute } from "./api/RoutsConfig";
+import SensorAdmin from "./features/SensorAdmin";
 
 function App() {
   const router = createBrowserRouter([
@@ -40,6 +41,17 @@ function App() {
         <ProtectedRoute>
           <Layout>
             <SensorLog />
+          </Layout>
+        </ProtectedRoute>
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/admin/sensors",
+      element: (
+        <ProtectedRoute>
+          <Layout>
+            <SensorAdmin />
           </Layout>
         </ProtectedRoute>
       ),
