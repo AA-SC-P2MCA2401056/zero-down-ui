@@ -1,30 +1,42 @@
 import React, { useEffect, useState } from "react";
 
+const TYPE_CONFIG = {
+  TEMPERATURE: { unit: "°C", prefix: "TP" },
+  HUMIDITY: { unit: "%", prefix: "HM" },
+  SOIL_MOISTURE: { unit: "%", prefix: "SL" },
+  LIGHT: { unit: "lx", prefix: "LG" },
+};
+
 const EMPTY_FORM = {
   id: "",
+  prefix: "TP",
   name: "",
   type: "TEMPERATURE",
   location: "",
   pinNumber: "",
   greenhouseId: "",
-  unit: "",
+  unit: "°C",
   active: true,
 };
 
 const SensorForm = ({ initial, onSubmit }) => {
   const [form, setForm] = useState(EMPTY_FORM);
+  const isEdit = !!initial;
 
   useEffect(() => {
     if (initial) {
+      const cfg = TYPE_CONFIG[initial.type];
+
       setForm({
-        id: initial.id || "",
-        name: initial.name || "",
-        type: initial.type || "TEMPERATURE",
-        location: initial.location || "",
-        pinNumber: initial.pinNumber || initial.pin_number || "",
-        greenhouseId: initial.greenhouseId || "",
-        unit: initial.unit || "",
-        active: !!initial.active,
+        id: initial.id ?? "",
+        prefix: cfg.prefix,
+        name: initial.name ?? "",
+        type: initial.type,
+        location: initial.location ?? "",
+        pinNumber: initial.pinNumber ?? "",
+        greenhouseId: initial.greenhouseId ?? "",
+        unit: initial.unit ?? cfg.unit,
+        active: initial.active ?? true,
       });
     } else {
       setForm(EMPTY_FORM);
@@ -32,34 +44,58 @@ const SensorForm = ({ initial, onSubmit }) => {
   }, [initial]);
 
   const handleChange = (field) => (e) => {
-    const value =
-      field === "active" ? e.target.checked : e.target.value;
-    setForm((f) => ({ ...f, [field]: value }));
+    const value = e.target.value;
+
+    setForm((prev) => {
+      const next = { ...prev, [field]: value };
+
+      if (field === "type") {
+        const cfg = TYPE_CONFIG[value];
+        next.prefix = cfg.prefix;
+        next.unit = cfg.unit;
+      }
+
+      return next;
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const payload = {
       ...form,
-      // adapt to backend property names
-      pinNumber: form.pinNumber,
+      fullName: `${form.prefix}-${form.name}`, // if backend expects combined name
     };
-    const isEdit = !!initial;
+
     onSubmit(payload, isEdit);
   };
 
   return (
-    <form className="space-y-3" onSubmit={handleSubmit}>
-      <div className="space-y-1">
-        <label className="text-xs text-slate-500">Name</label>
-        <input
-          className="w-full border border-slate-200 rounded-md px-2 py-1.5 text-sm"
-          value={form.name}
-          onChange={handleChange("name")}
-          required
-        />
+    <form className="space-y-4" onSubmit={handleSubmit}>
+      {/* Prefix + Name */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="space-y-1">
+          <label className="text-xs text-slate-500">Prefix</label>
+          <input
+            className="w-full bg-slate-100 border border-slate-200 rounded-md px-2 py-1.5 text-sm"
+            value={form.prefix}
+            readOnly
+          />
+        </div>
+
+        <div className="col-span-2 space-y-1">
+          <label className="text-xs text-slate-500">Name</label>
+          <input
+            className="w-full border border-slate-200 rounded-md px-2 py-1.5 text-sm"
+            value={form.name}
+            onChange={handleChange("name")}
+            placeholder="Greenhouse Temp Sensor"
+            required
+          />
+        </div>
       </div>
 
+      {/* Type + Unit */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
           <label className="text-xs text-slate-500">Type</label>
@@ -78,61 +114,42 @@ const SensorForm = ({ initial, onSubmit }) => {
         <div className="space-y-1">
           <label className="text-xs text-slate-500">Unit</label>
           <input
-            className="w-full border border-slate-200 rounded-md px-2 py-1.5 text-sm"
+            className="w-full bg-slate-100 border border-slate-200 rounded-md px-2 py-1.5 text-sm"
             value={form.unit}
-            onChange={handleChange("unit")}
-            placeholder="°C, %, lx, ..."
+            readOnly
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <label className="text-xs text-slate-500">Location</label>
-          <input
-            className="w-full border border-slate-200 rounded-md px-2 py-1.5 text-sm"
-            value={form.location}
-            onChange={handleChange("location")}
-            placeholder="North bed, Roof, ..."
-          />
-        </div>
-
-        <div className="space-y-1">
-          <label className="text-xs text-slate-500">Pin / Channel</label>
-          <input
-            className="w-full border border-slate-200 rounded-md px-2 py-1.5 text-sm"
-            value={form.pinNumber}
-            onChange={handleChange("pinNumber")}
-            placeholder="A0, D5, GPIO12..."
-          />
-        </div>
-      </div>
-
+      {/* Location */}
       <div className="space-y-1">
-        <label className="text-xs text-slate-500">Greenhouse ID (optional)</label>
+        <label className="text-xs text-slate-500">Location</label>
         <input
           className="w-full border border-slate-200 rounded-md px-2 py-1.5 text-sm"
-          value={form.greenhouseId}
-          onChange={handleChange("greenhouseId")}
-          placeholder="GH-001"
+          value={form.location}
+          onChange={handleChange("location")}
+          placeholder="North rack, Roof, Bed #2..."
         />
       </div>
 
-      <div className="flex items-center justify-between pt-2">
-        <label className="flex items-center gap-2 text-xs text-slate-600">
-          <input
-            type="checkbox"
-            checked={form.active}
-            onChange={handleChange("active")}
-          />
-          Active
-        </label>
+      {/* Pin */}
+      <div className="space-y-1">
+        <label className="text-xs text-slate-500">Pin Number</label>
+        <input
+          className="w-full border border-slate-200 rounded-md px-2 py-1.5 text-sm"
+          value={form.pinNumber}
+          onChange={handleChange("pinNumber")}
+          placeholder="D5, A0, GPIO14..."
+        />
+      </div>
 
+      {/* Submit */}
+      <div className="flex justify-end pt-2">
         <button
           type="submit"
           className="bg-slate-900 text-white px-4 py-1.5 rounded-md text-sm"
         >
-          {initial ? "Save Changes" : "Create Sensor"}
+          {isEdit ? "Save Changes" : "Create Sensor"}
         </button>
       </div>
     </form>

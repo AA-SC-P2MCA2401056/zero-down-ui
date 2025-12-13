@@ -3,6 +3,8 @@ import ApiConfig from "../api/apiConfig";
 import toast from "react-hot-toast";
 import SensorTable from "../components/Admin/SensorTable";
 import SensorForm from "../components/Admin/SensorForm";
+import Modal from "../components/Admin/Modal";
+import ConfirmDialog from "../components/ConfirmDialog";
 
 const SensorAdmin = () => {
   const [sensors, setSensors] = useState([]);
@@ -10,6 +12,12 @@ const SensorAdmin = () => {
   const [selectedSensor, setSelectedSensor] = useState(null); // for edit
   const [filterType, setFilterType] = useState("ALL");
   const [search, setSearch] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);      // create/edit popup
+
+  // delete dialog state
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const loadSensors = async () => {
     try {
@@ -39,6 +47,7 @@ const SensorAdmin = () => {
         toast.success("Sensor created");
       }
       setSelectedSensor(null);
+      setIsModalOpen(false);
       loadSensors();
     } catch (err) {
       console.error("Save sensor failed", err);
@@ -46,16 +55,32 @@ const SensorAdmin = () => {
     }
   };
 
-  const handleDelete = async (sensor) => {
-    if (!window.confirm(`Delete sensor "${sensor.name}"?`)) return;
+  // Instead of window.confirm, just open the dialog
+  const requestDelete = (sensor) => {
+    setDeleteTarget(sensor);
+    setIsDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await ApiConfig.deleteRequest(`/api/admin/sensors/${sensor.id}`);
+      setDeleting(true);
+      await ApiConfig.deleteRequest(`/api/admin/sensors/${deleteTarget.id}`);
       toast.success("Sensor deleted");
+      setIsDeleteOpen(false);
+      setDeleteTarget(null);
       loadSensors();
     } catch (err) {
       console.error("Delete sensor failed", err);
       toast.error("Failed to delete sensor");
+    } finally {
+      setDeleting(false);
     }
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteOpen(false);
+    setDeleteTarget(null);
   };
 
   const handleToggleActive = async (sensor) => {
@@ -72,8 +97,7 @@ const SensorAdmin = () => {
   };
 
   const filteredSensors = sensors.filter((s) => {
-    const matchesType =
-      filterType === "ALL" ? true : s.type === filterType;
+    const matchesType = filterType === "ALL" ? true : s.type === filterType;
     const q = search.trim().toLowerCase();
     const matchesSearch =
       !q ||
@@ -95,7 +119,10 @@ const SensorAdmin = () => {
             </p>
           </div>
           <button
-            onClick={() => setSelectedSensor(null)}
+            onClick={() => {
+              setSelectedSensor(null);  // create mode
+              setIsModalOpen(true);     // open popup
+            }}
             className="bg-slate-900 text-white px-4 py-2 rounded-md text-sm"
           >
             + New Sensor
@@ -130,39 +157,59 @@ const SensorAdmin = () => {
           </div>
         </div>
 
-        {/* Content grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Table */}
-          <section className="lg:col-span-2 bg-white p-4 rounded-2xl shadow">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-lg font-semibold">Sensors</h2>
-              {loading && (
-                <span className="text-xs text-slate-400 animate-pulse">
-                  Loading...
-                </span>
-              )}
-            </div>
-            <SensorTable
-              sensors={filteredSensors}
-              onEdit={setSelectedSensor}
-              onDelete={handleDelete}
-              onToggleActive={handleToggleActive}
-            />
-          </section>
-
-          {/* Form */}
-          <section className="bg-white p-4 rounded-2xl shadow">
-            <h2 className="text-lg font-semibold mb-3">
-              {selectedSensor ? "Edit Sensor" : "Create Sensor"}
-            </h2>
-            <SensorForm
-              key={selectedSensor?.id || "new"}
-              initial={selectedSensor}
-              onSubmit={handleCreateOrUpdate}
-            />
-          </section>
-        </div>
+        {/* Table only */}
+        <section className="bg-white p-4 rounded-2xl shadow">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-lg font-semibold">Sensors</h2>
+            {loading && (
+              <span className="text-xs text-slate-400 animate-pulse">
+                Loading...
+              </span>
+            )}
+          </div>
+          <SensorTable
+            sensors={filteredSensors}
+            onEdit={(sensor) => {
+              setSelectedSensor(sensor); // edit mode
+              setIsModalOpen(true);      // open popup
+            }}
+            onDelete={requestDelete}      // ⬅️ open confirm dialog
+            onToggleActive={handleToggleActive}
+          />
+        </section>
       </div>
+
+      {/* Create / Edit Sensor Modal */}
+      <Modal
+        open={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedSensor(null);
+        }}
+        title={selectedSensor ? "Edit Sensor" : "Create Sensor"}
+      >
+        <SensorForm
+          key={selectedSensor?.id || "new"}
+          initial={selectedSensor}
+          onSubmit={handleCreateOrUpdate}
+        />
+      </Modal>
+
+      {/* Delete confirmation dialog */}
+      <ConfirmDialog
+        open={isDeleteOpen}
+        onCancel={cancelDelete}
+        onConfirm={confirmDelete}
+        loading={deleting}
+        title="Delete sensor?"
+        message={
+          deleteTarget
+            ? `Are you sure you want to delete sensor "${deleteTarget.name}"? This cannot be undone.`
+            : "Are you sure you want to delete this sensor?"
+        }
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+      />
     </div>
   );
 };

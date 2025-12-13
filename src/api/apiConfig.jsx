@@ -45,6 +45,7 @@ const getRequest = async (endpoint, params = {}) => {
   });
 
   if (response.status === 401) handleUnauthorized();
+  if (response.status === 403) handleNetworkError();
   if (!response.ok)
     throw new Error(`GET ${endpoint} failed: ${response.status}`);
   return response.json();
@@ -60,6 +61,7 @@ const postRequest = async (endpoint, body = {}) => {
     });
 
     if (response.status === 401) handleUnauthorized();
+    if (response.status === 403) handleNetworkError();
     if (!response.ok)
       handleNetworkError(error, endpoint);
     return response.json();
@@ -77,6 +79,7 @@ const putRequest = async (endpoint, body = {}) => {
   });
 
   if (response.status === 401) handleUnauthorized();
+  if (response.status === 403) handleNetworkError();
   if (!response.ok)
     throw new Error(`PUT ${endpoint} failed: ${response.status}`);
   return response.json();
@@ -91,9 +94,9 @@ const deleteRequest = async (endpoint, body = {}) => {
   });
 
   if (response.status === 401) handleUnauthorized();
+  if (response.status === 403) handleNetworkError();
   if (!response.ok)
     throw new Error(`DELETE ${endpoint} failed: ${response.status}`);
-  return response.json();
 };
 
 
