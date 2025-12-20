@@ -52,7 +52,8 @@ const LoginForm = ({ switchForm }) => {
         ApiConfig.ENDPOINTS.LOGIN,
         { username: email, password: password }
       );
-
+      console.log("inside login")
+      console.log(response)
       const token = response.data?.token || response.token; // handle both backend formats
       if (!token) throw new Error("Missing token in response");
 
