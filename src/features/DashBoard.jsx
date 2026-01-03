@@ -111,13 +111,25 @@ const DashBoardD = () => {
       const data = snapshot.val();
       if (!data) return;
 
+      const liveLgt = Number(data.lightPercent);
       const liveTemp = Number(data.temperature);
       const liveHumidity = Number(data.humidity);
       const liveTime = Number(data.timestamp);
 
       if (!liveTime) return;
+      if (liveTemp > 27) {
+        setEvents(ev => [
+          {
+            id: Date.now(),
+            time: Date.now(),
+            msg: `High temperature alert: ${liveTemp}°C`
+          },
+          ...ev
+        ].slice(0, 10));
+      }
 
       // 🔥 UPDATE METRIC CARDS (LIVE)
+      setLight(liveLgt);
       setTemp(liveTemp);
       setHumidity(liveHumidity);
 
@@ -136,7 +148,7 @@ const DashBoardD = () => {
           temp: liveTemp,
           humidity: liveHumidity,
           soil: arr[arr.length - 1]?.soil ?? soil,
-          light: arr[arr.length - 1]?.light ?? light,
+          light: liveLgt,
         };
 
         return [...arr, nextPoint].slice(-30);

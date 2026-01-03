@@ -28,7 +28,14 @@ const MetricCards = (props) => {
         </div>
 
         <div className="flex items-baseline justify-between">
-          <h2 className="text-3xl font-semibold">{temp}°C</h2>
+          <h2
+            className={`text-3xl font-semibold ${
+              temp > 27 ? "text-amber-600" : temp > 30 ? "text-red-600": "text-slate-900"
+            }`}
+          >
+            {temp}°C
+          </h2>
+
           <div className="text-sm text-slate-500">Set: 25°C</div>
         </div>
 

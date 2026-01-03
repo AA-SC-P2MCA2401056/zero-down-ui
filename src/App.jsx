@@ -9,6 +9,7 @@ import SensorLog from "./features/SensorLog";
 import Login from "./features/Login";
 import { ProtectedRoute, PublicRoute } from "./api/RoutsConfig";
 import SensorAdmin from "./features/SensorAdmin";
+import Events from "./features/Events";
 
 function App() {
   const router = createBrowserRouter([
@@ -52,6 +53,17 @@ function App() {
         <ProtectedRoute>
           <Layout>
             <SensorAdmin />
+          </Layout>
+        </ProtectedRoute>
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/events",
+      element: (
+        <ProtectedRoute>
+          <Layout>
+            <Events />
           </Layout>
         </ProtectedRoute>
       ),
