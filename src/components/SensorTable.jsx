@@ -6,7 +6,7 @@ const SensorTable = ({ history }) => {
   const safeHistory = Array.isArray(history) ? history : [];
 
   // Safely pick latest items
-  const latest = [...safeHistory].reverse().slice(0, 12);
+  const latest = [...safeHistory].sort((a,b) => b.time - a.time);
 
   // Safe format helper (avoids null.toFixed() crash)
   const safeNumber = (value, decimals = 1) => {

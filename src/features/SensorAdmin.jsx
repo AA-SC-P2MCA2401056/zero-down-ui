@@ -26,7 +26,6 @@ const SensorAdmin = () => {
       setSensors(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to load sensors", err);
-      toast.error("Failed to load sensors");
       setSensors([]);
     } finally {
       setLoading(false);

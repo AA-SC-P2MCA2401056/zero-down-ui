@@ -82,13 +82,10 @@ const Login = () => {
                   transition={{ duration: 0.6 }}
                   className="relative max-w-md px-6"
                 >
-                  <h1 className="text-4xl md:text-5xl font-extrabold text-indigo-500 drop-shadow-lg mb-4">
-                    Join Our Garden 🌼
-                  </h1>
-                  <p className="text-white/90 text-lg md:text-xl leading-relaxed">
-                    Create your account and grow smarter — track, nurture, and
-                    bloom with your personalized greenhouse dashboard.
-                  </p>
+                  <h5 className="text-3xl md:text-5xl text-indigo-500 drop-shadow-lg mb-4">
+                    Join Our Garden
+                  </h5>
+                  
                 </motion.div>
               )}
             </AnimatePresence>

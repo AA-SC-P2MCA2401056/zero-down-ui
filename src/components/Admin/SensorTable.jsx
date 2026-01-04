@@ -108,23 +108,12 @@ const SensorTable = ({ sensors, onEdit, onDelete, onToggleActive }) => {
                 </span>
               </td>
               <td className="py-2 pr-4">
-                <ActiveBadge active={!!s.active} />
+                <ActiveBadge active={!!s.isActive} />
               </td>
                 <td className="py-2 pr-0 text-right">
                     <div className="flex items-center justify-end gap-2">
 
-                        {/* Activate / Deactivate */}
-                        <button
-                        onClick={() => onToggleActive(s)}
-                        className="p-1.5 rounded-md border border-slate-200 hover:bg-slate-100"
-                        title={s.active ? "Deactivate" : "Activate"}
-                        >
-                        {s.active ? (
-                            <PowerOff size={16} className="text-rose-500" />
-                        ) : (
-                            <Power size={16} className="text-emerald-600" />
-                        )}
-                        </button>
+                        
 
                         {/* Edit */}
                         <button
