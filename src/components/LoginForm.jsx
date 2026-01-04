@@ -113,9 +113,12 @@ const LoginForm = ({ switchForm }) => {
         
       </motion.p>
 
-      <form onSubmit={handleLogin} className="flex flex-col gap-4">
+      <form autoComplete="off" onSubmit={handleLogin} className="flex flex-col gap-4">
         <motion.input
           type="email"
+          name="fake_email"
+          autoComplete="new-email"
+          inputMode="email"
           placeholder="Email"
           value={email}
           onChange={handleEmailChange}
@@ -132,6 +135,8 @@ const LoginForm = ({ switchForm }) => {
 
         <motion.input
           type="password"
+          name="fake_password"
+          autoComplete="new-password"
           placeholder="Password"
           value={password}
           onChange={handlePasswordChange}

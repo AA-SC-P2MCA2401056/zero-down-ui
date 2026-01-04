@@ -89,7 +89,7 @@ const RegisterForm = ({ switchForm }) => {
         Create your account and plant the first seed 🌱
       </motion.p>
 
-      <form onSubmit={handleRegister} className="flex flex-col gap-4">
+      <form autoComplete="off"  onSubmit={handleRegister} className="flex flex-col gap-4">
 
         {/* Name */}
         <input
@@ -106,6 +106,9 @@ const RegisterForm = ({ switchForm }) => {
         {/* Email */}
         <input
           type="email"
+          name="fake_email"
+          autoComplete="new-email"
+          inputMode="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -117,6 +120,8 @@ const RegisterForm = ({ switchForm }) => {
 
         {/* Password */}
         <input
+          name="fake_password"
+          autoComplete="new-password"
           type="password"
           placeholder="Password"
           value={password}

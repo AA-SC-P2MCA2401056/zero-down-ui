@@ -26,6 +26,12 @@ const Sidebar = () => {
     location.pathname.startsWith("/admin")
   );
 
+  const handleLogout = () => {
+    localStorage.removeItem("jwt_token");
+    localStorage.removeItem("user");
+    window.location.href = "/login"; // hard redirect to kill state
+  };
+
 
   const navItems = [
     { path: "/", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
@@ -130,6 +136,7 @@ const Sidebar = () => {
       {/* Logout */}
       <div className="mt-auto">
         <button
+          onClick={handleLogout}
           className={`flex items-center gap-3 px-3 py-2 text-amber-800 hover:bg-red-100 rounded w-full transition ${
             collapsed ? "justify-center" : ""
           }`}
