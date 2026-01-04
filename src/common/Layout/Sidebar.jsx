@@ -11,7 +11,8 @@ import {
   Shield,
   PlusIcon,
   ChevronDown,
-  Logs
+  Logs,
+  Bell
 } from "lucide-react";
 
 import React from "react";
@@ -29,8 +30,9 @@ const Sidebar = () => {
   const navItems = [
     { path: "/", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
     { path: "/logs", label: "Sensor Log", icon: <Logs size={18} /> },
-    { path: "/events", label: "Events", icon: <SiEventstore size={18} /> },
     { path: "/settings", label: "Settings", icon: <Settings size={18} /> },
+    { path: "/alert", label: "Notification", icon: <Bell size={18}/> }
+
   ];
 
   const adminItems = [
@@ -40,7 +42,7 @@ const Sidebar = () => {
       icon: <SmartphoneNfc size={18} />,
     },
     {
-      path: "/d",
+      path: "/admin/sensorLog",
       label: "Sensor Log",
       icon: <Logs size={18} />,
     },

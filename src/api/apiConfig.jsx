@@ -36,6 +36,12 @@ const ENDPOINTS = {
 
   // Admin
   ADMIN_SENSORS: "/api/admin/sensors",
+  ADMIN_SENSORS_LOGS: "/api/admin/sensors-log/",
+
+  // Alerts
+  ALERT_ACTIVE: "/api/alert/active",
+  ALERT_HISTORY: "/api/alert/history",
+  ALERT_RESOLVE: "/api/alert",   // + /{id}/resolve
 };
 
 /* ------------------------- Central Request Handler ------------------------- */

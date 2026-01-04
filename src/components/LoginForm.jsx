@@ -110,9 +110,7 @@ const LoginForm = ({ switchForm }) => {
         <span className="text-4xl font-bold text-amber-900 drop-shadow-lg block">
           Welcome Back 🌸
         </span>
-        <span className="text-white-800 text-base">
-          Ready to nurture your greens?
-        </span>
+        
       </motion.p>
 
       <form onSubmit={handleLogin} className="flex flex-col gap-4">

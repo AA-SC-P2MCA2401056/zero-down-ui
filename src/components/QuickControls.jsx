@@ -15,12 +15,7 @@ const QuickControls = (props) => {
           >
             {irrigationOn ? 'Stop Irrigation' : 'Start Irrigation'}
           </button>
-          <button
-            onClick={trimHistory}
-            className="px-3 py-2 rounded-lg bg-slate-100 text-sm"
-          >
-            Trim History
-          </button>
+          
         </div>
       </div>
 
@@ -29,7 +24,7 @@ const QuickControls = (props) => {
         <SoilLightChart data={barData} />
       </div>
 
-      <div>
+      {/* <div>
         <h4 className="text-sm text-slate-500">Recent Events</h4>
         <ul className="mt-2 space-y-2">
           {events.map(ev => (
@@ -41,7 +36,7 @@ const QuickControls = (props) => {
             </li>
           ))}
         </ul>
-      </div>
+      </div> */}
     </aside>
   );
 };

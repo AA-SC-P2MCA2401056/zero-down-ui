@@ -179,8 +179,8 @@ const DashBoardD = () => {
 
     return visible.map((p) => ({
       time: formatTime(p.time),
-      temp: Number(p.temp.toFixed(2)),
-      humidity: Number(p.humidity.toFixed(1)),
+      temp: p.temp != null ? Number(p.temp.toFixed(1)) : "--",
+      humidity: p.humidity != null ? Number(p.humidity.toFixed(1)) : "--",
     }));
   }, [history]);
 
@@ -200,6 +200,7 @@ const DashBoardD = () => {
   // ---------------------------------------------
   const toggleIrrigation = () => {
     setIrrigationOn((v) => !v);
+    toast.success("For Future enhancement")
   };
 
   // ---------------------------------------------
