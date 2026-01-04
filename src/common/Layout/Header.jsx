@@ -10,6 +10,13 @@ const Header = () => {
     setAlertCount(data?.length || 0);
   };
 
+  const handleLogout = () => {
+  localStorage.removeItem("jwt_token");
+  localStorage.removeItem("user");
+  window.location.href = "/login"; // hard redirect to kill state
+};
+
+
   useEffect(() => {
     loadAlertCount();
     const i = setInterval(loadAlertCount, 5000);
@@ -29,7 +36,7 @@ const Header = () => {
         )}
 
         <button className="hover:bg-emerald-500 px-3 py-1 rounded">Settings</button>
-        <button className="hover:bg-emerald-500 px-3 py-1 rounded">Logout</button>
+        <button onClick={handleLogout} className="hover:bg-emerald-500 px-3 py-1 rounded">Logout</button>
       </div>
     </header>
   );
