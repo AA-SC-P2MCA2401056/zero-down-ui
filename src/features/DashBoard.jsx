@@ -111,10 +111,11 @@ const DashBoardD = () => {
       const data = snapshot.val();
       if (!data) return;
 
-      const liveLgt = Number(data.lightPercent);
+      const liveLgt = Number(data.lightLux);
       const liveTemp = Number(data.temperature);
       const liveHumidity = Number(data.humidity);
       const liveTime = Number(data.timestamp);
+      const liveSoil = Number(data.soilPercent);
 
       if (!liveTime) return;
       if (liveTemp > 27) {
@@ -132,6 +133,7 @@ const DashBoardD = () => {
       setLight(liveLgt);
       setTemp(liveTemp);
       setHumidity(liveHumidity);
+      setSoil(liveSoil);
 
       // 🔥 NEW: update timestamp for LIVE / STALE badge
       setLatestTimestamp(liveTime);
@@ -147,7 +149,7 @@ const DashBoardD = () => {
           time: liveTime,
           temp: liveTemp,
           humidity: liveHumidity,
-          soil: arr[arr.length - 1]?.soil ?? soil,
+          soil: liveSoil,
           light: liveLgt,
         };
 

@@ -30,7 +30,7 @@ const MetricCards = (props) => {
         <div className="flex items-baseline justify-between">
           <h2
             className={`text-3xl font-semibold ${
-              temp > 27 ? "text-amber-600" : temp > 30 ? "text-red-600": "text-slate-900"
+              temp < 18  ? "text-amber-600" : temp > 30 ? "text-red-600": "text-slate-900"
             }`}
           >
             {temp}°C
@@ -47,19 +47,34 @@ const MetricCards = (props) => {
 
       <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.05 }} className="bg-white p-4 rounded-2xl shadow">
         <p className="text-sm text-slate-500">Humidity</p>
-        <h2 className="text-3xl font-semibold">{humidity}%</h2>
+        <h2 className={`text-3xl font-semibold
+            ${
+              humidity < 55  ? "text-amber-600" : humidity > 80 ? "text-red-600": "text-slate-900"
+            }`}>
+              {humidity}%
+        </h2>
         <p className="text-xs text-slate-400 mt-1">Comfort range: 50% - 70%</p>
       </motion.div>
 
       <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="bg-white p-4 rounded-2xl shadow">
         <p className="text-sm text-slate-500">Soil Moisture</p>
-        <h2 className="text-3xl font-semibold">{soil}%</h2>
+        <h2 className={`text-3xl font-semibold
+            ${
+              soil < 35  ? "text-amber-600" : soil > 85 ? "text-red-600": "text-slate-900"
+            }`} >
+          {soil}%
+        </h2>
         <p className="text-xs text-slate-400 mt-1">Irrigation: {irrigationOn ? "ON" : "OFF"}</p>
       </motion.div>
 
       <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }} className="bg-white p-4 rounded-2xl shadow">
         <p className="text-sm text-slate-500">Light</p>
-        <h2 className="text-3xl font-semibold">{light} lx</h2>
+        <h2 className={`text-3xl font-semibold
+            ${
+              light < 300  ? "text-amber-600" : light > 1200 ? "text-red-600": "text-slate-900"
+            }`}>
+          {light} lx
+        </h2>
         <p className="text-xs text-slate-400 mt-1">Auto shades: disabled</p>
       </motion.div>
     </div>

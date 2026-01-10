@@ -5,6 +5,7 @@ import {
 import ApiConfig from "../api/apiConfig";
 import { useLoading } from "../common/LoadingContext";
 import DatePicker from "react-datepicker";
+import SensorTypeBadge from "../common/SensorBadge";
 
 const AdminSensorAnalytics = () => {
 
@@ -132,7 +133,9 @@ const AdminSensorAnalytics = () => {
             <div>
             <p className="text-xs text-gray-500 uppercase">Sensor</p>
             <p className="text-xl font-bold text-emerald-700">{sensorInfo.name}</p>
-            <p className="text-sm text-gray-600">{sensorInfo.type}</p>
+            <p className="text-sm text-gray-600 mb-2">
+              <SensorTypeBadge type={sensorInfo.type} />
+            </p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
