@@ -8,114 +8,91 @@ import toast from "react-hot-toast";
 
 const API_BASE_URL = "http://localhost:8081";
 
+/* ------------------------------ Helpers ------------------------------ */
+
+// Base headers
 const DEFAULT_HEADERS = {
   "Content-Type": "application/json",
   Accept: "application/json",
 };
 
-// 🔐 Helper to get JWT token from localStorage
+// Pull JWT token
 const getToken = () => localStorage.getItem("jwt_token");
 
-// 🔐 Inject Authorization header dynamically
+// Auth headers
 const authHeaders = () => ({
   ...DEFAULT_HEADERS,
   Authorization: `Bearer ${getToken()}`,
 });
 
-// 🌿 Define all endpoints here
+/* ------------------------------ Endpoints ------------------------------ */
+
 const ENDPOINTS = {
-  LOGIN: "/auth/login",
-  REGISTER: "/auth/register",
+  LOGIN: "/api/auth/login",
+  REGISTER: "/api/auth/register",
   SENSOR_HISTORY: "/api/v1/sensor-readings/history",
-  SNAPSHOT: "/api/v1/dashboard/latest",
+  SNAPSHOT: "/api/v1/dashboard/snapshot",
   SENSOR_DASHBOARD_HISTORY: "/api/v1/dashboard/history",
-  // Add more as needed
+
+  // Admin
+  ADMIN_SENSORS: "/api/admin/sensors",
+  ADMIN_SENSORS_LOGS: "/api/admin/sensors-log/",
+
+  // Alerts
+  ALERT_ACTIVE: "/api/alert/active",
+  ALERT_HISTORY: "/api/alert/history",
+  ALERT_RESOLVE: "/api/alert",   // + /{id}/resolve
 };
 
-// 🔧 GET request
-const getRequest = async (endpoint, params = {}) => {
-  const url = new URL(API_BASE_URL + endpoint);
-  Object.keys(params).forEach((key) =>
-    url.searchParams.append(key, params[key])
-  );
+/* ------------------------- Central Request Handler ------------------------- */
 
-  const response = await fetch(url, {
-    method: "GET",
-    headers: authHeaders(),
-  });
-
-  if (response.status === 401) handleUnauthorized();
-  if (!response.ok)
-    throw new Error(`GET ${endpoint} failed: ${response.status}`);
-  return response.json();
-};
-
-// 🔧 POST request
-const postRequest = async (endpoint, body = {}) => {
+const apiRequest = async (method, endpoint, body = null, isPublic = false, params = {}) => {
   try {
-    const response = await fetch(API_BASE_URL + endpoint, {
-      method: "POST",
-      headers: authHeaders(),
-      body: JSON.stringify(body),
+    // Build URL with query params
+    const url = new URL(API_BASE_URL + endpoint);
+    Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
+
+    const response = await fetch(url, {
+      method,
+      headers: isPublic ? DEFAULT_HEADERS : authHeaders(),
+      body: body ? JSON.stringify(body) : null,
     });
 
-    if (response.status === 401) handleUnauthorized();
-    if (!response.ok)
-      handleNetworkError(error, endpoint);
-    return response.json();
-  } catch (error) {
-    handleNetworkError(error, endpoint);
-  }
-};
+    const data = await response.json();
+    console.log(data)
 
-// 🔧 PUT request
-const putRequest = async (endpoint, body = {}) => {
-  const response = await fetch(API_BASE_URL + endpoint, {
-    method: "PUT",
-    headers: authHeaders(),
-    body: JSON.stringify(body),
-  });
+    // Handle unauthorized
+    if (response.status === 401) return handleUnauthorized();
 
-  if (response.status === 401) handleUnauthorized();
-  if (!response.ok)
-    throw new Error(`PUT ${endpoint} failed: ${response.status}`);
-  return response.json();
-};
-
-// 🔧 DELETE request
-const deleteRequest = async (endpoint, body = {}) => {
-  const response = await fetch(API_BASE_URL + endpoint, {
-    method: "DELETE",
-    headers: authHeaders(),
-    body: JSON.stringify(body),
-  });
-
-  if (response.status === 401) handleUnauthorized();
-  if (!response.ok)
-    throw new Error(`DELETE ${endpoint} failed: ${response.status}`);
-  return response.json();
-};
-
-
-const postPublicRequest = async (endpoint, body = {}) => {
-  try {
-    const response = await fetch(API_BASE_URL + endpoint, {
-      method: "POST",
-      headers: DEFAULT_HEADERS,
-      body: JSON.stringify(body),
-    });
+    // If not OK → throw so error handler can catch it
     if (!response.ok) {
-      // Pass the response for login-page to detect invalid creds (401)
-      throw response;
+      throw { status: response.status, message: response.statusText };
     }
 
-    return await response.json();
-  } catch (error) {
-    handleNetworkError(error, endpoint);
-    throw error; // rethrow to allow login page to check status
+    // DELETE has no JSON body sometimes
+    if (response.status === 204) return null;
+
+    return data;
+  } catch (err) {
+    handleNetworkError(err, endpoint);
+    throw err; // rethrow so UI can catch
   }
 };
 
+/* ------------------------------ API Methods ------------------------------ */
+
+const getRequest = (endpoint, params) => apiRequest("GET", endpoint, null, false, params);
+
+const postRequest = (endpoint, body) => apiRequest("POST", endpoint, body);
+
+const putRequest = (endpoint, body) => apiRequest("PUT", endpoint, body);
+
+const deleteRequest = (endpoint, body) => apiRequest("DELETE", endpoint, body);
+
+// Public request → used for login/register
+const postPublicRequest = (endpoint, body) => apiRequest("POST", endpoint, body, true);
+
+/* ------------------------------ Error Handling ------------------------------ */
 
 const handleUnauthorized = () => {
   localStorage.removeItem("jwt_token");
@@ -124,47 +101,45 @@ const handleUnauthorized = () => {
 };
 
 const handleNetworkError = (err, endpoint = "") => {
-  const message = typeof err?.message === "string" ? err.message : "";
-  // Network failure (server unreachable)
+  const msg = err?.message || "";
+
+  // Server not reachable
   if (
-    message.includes("Failed to fetch") ||
-    message.includes("ERR_CONNECTION_REFUSED" )||
-    message.includes("Failed to execute")
+    msg.includes("Failed to fetch") ||
+    msg.includes("ERR_CONNECTION_REFUSED")
   ) {
-    toast.error("Server unreachable. Please check your connection.");
+    toast.error("Unable to reach server. Check your connection.");
     return;
   }
 
-  debugger;
-  // HTTP status-based errors
-  const status = err?.status || err?.response?.status;
+  const status = err?.status;
 
-  if (status === 400) {
-    toast.error("Bad request. Please check your input.");
-  } else if (status === 401) {
-    toast.error("Invalid Credentials!!");
-  } else if (status === 403) {
-    toast.error("Forbidden. You don’t have permission.");
-  } else if (status === 404) {
-    toast.error(`Endpoint not found: ${endpoint}`);
-  } else if (status === 405) {
-    toast.error("Method not allowed.");
-  } else if (status === 500) {
-    toast.error("Internal server error.");
-  } else if (status >= 400 && status < 500) {
-    toast.error(`Client error (${status}).`);
-  } else if (status >= 500) {
-    toast.error(`Server error (${status}).`);
-  } else {
-    toast.error("Unexpected error occurred.");
+  switch (status) {
+    case 400:
+      toast.error("Invalid request. Please check your input.");
+      break;
+    case 401:
+      toast.error("Unauthorized. Please log in again.");
+      break;
+    case 403:
+      toast.error("Forbidden. You don't have permission.");
+      break;
+    case 404:
+      toast.error(`Endpoint not found: ${endpoint}`);
+      break;
+    case 405:
+      toast.error("Method not allowed.");
+      break;
+    case 500:
+      toast.error("Internal server error.");
+      break;
+    default:
+      toast.error(`Unexpected error: ${status || "Unknown"}`);
   }
-
-  throw err;
 };
 
+/* ------------------------------ Export ------------------------------ */
 
-
-// 🚀 Export everything
 const ApiConfig = {
   API_BASE_URL,
   ENDPOINTS,
